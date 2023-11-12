@@ -31,6 +31,7 @@ import firebaseApp from "../data/firebaseConfig";
 import "./NewEmergency.css";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, useHistory } from "react-router-dom";
+import { getMessages } from "../data/model";
 
 // ... (importaciones)
 
@@ -45,6 +46,12 @@ const NewEmergency: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(
     undefined
   );
+
+  const lengtOfMessages = async () => {
+    const messages = await getMessages();
+
+    return String(messages.length + 1);
+  };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -67,6 +74,7 @@ const NewEmergency: React.FC = () => {
   const submitForm = () => {
     const date = new Date().toISOString();
     const title = (document.querySelector("#title") as HTMLInputElement)?.value;
+    const id = (document.querySelector("#id") as HTMLInputElement)?.value;
     const pasiente = (document.querySelector("#pasiente") as HTMLInputElement)
       ?.value;
     const description = (
@@ -81,7 +89,7 @@ const NewEmergency: React.FC = () => {
     }
 
     const db = getDatabase(firebaseApp);
-    const emergenciesRef = ref(db, "llamada");
+    const emergenciesRef = ref(db, "llamadas");
 
     const newEmergency = {
       date,

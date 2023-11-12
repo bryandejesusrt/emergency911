@@ -1,5 +1,12 @@
 // Asegúrate de que la ruta sea correcta
 import { getDatabase, ref, get, child } from "firebase/database";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import firebaseApp from "./firebaseConfig";
 
 export interface Emergency {
@@ -7,13 +14,13 @@ export interface Emergency {
   date: string;
   title: string;
   description: string;
-  photoURL: string;
-  paciente: string;
+  photoUrl: string;
+  pasiente: string;
 }
 
 export const getMessages = async () => {
   const db = getDatabase(firebaseApp);
-  const messagesRef = ref(db, "llamada"); // Ajusta la ruta según la ubicación real de tus mensajes
+  const messagesRef = ref(db, "llamadas"); // Ajusta la ruta según la ubicación real de tus mensajes
 
   try {
     const snapshot = await get(child(messagesRef, "/"));
@@ -29,14 +36,16 @@ export const getMessages = async () => {
   }
 };
 
-export const getMessagesByid = async (id: string) => {
+export const getMessageById = async (date: string) => {
   const db = getDatabase(firebaseApp);
-  const messagesRef = ref(db, `llamada/${id}`); // Ajusta la ruta según la ubicación real de tus mensajes
+  const messagesRef = ref(db, "llamadas"); // Ajusta la ruta según la ubicación real de tus mensajes
 
   try {
     const snapshot = await get(child(messagesRef, "/"));
     if (snapshot.exists()) {
-      const messages = Object.values(snapshot.val());
+      const messages = Object.values(snapshot.val()).filter(
+        (m: Emergency) => m.date == date
+      );
       return messages;
     } else {
       return [];

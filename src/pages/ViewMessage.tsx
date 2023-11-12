@@ -18,36 +18,28 @@ import { useParams } from "react-router";
 import { getDatabase, ref, get, child } from "firebase/database";
 import firebaseApp from "../data/firebaseConfig";
 import "./ViewMessage.css";
-import { Emergency } from "../data/model";
+import { getMessageById, Emergency } from "../data/model";
 
 function ViewMessage() {
   const [emergencyData, setEmergencyData] = useState<Emergency | null>(null);
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ date: string }>();
 
-  useIonViewDidEnter(() => {
-    console.log("ionViewWillEnter event fired");
-    const db = getDatabase(firebaseApp);
-    const messageRef = ref(db, `llamada/1/${params.id}`);
-
-    get(child(messageRef, "/"))
-      .then((snapshot) => {
-        console.log(snapshot.val());
-        console.log(params.id);
-        if (
-          snapshot.exists() &&
-          snapshot.val() !== null &&
-          snapshot.val() !== undefined
-        ) {
-          setEmergencyData(snapshot.val());
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const msgs: any = await getMessageById(params.date);
+        if (Array.isArray(msgs)) {
+          setEmergencyData(msgs[0]);
         } else {
-          setEmergencyData(null);
+          console.error("Invalid data received:", msgs);
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching message:", error);
-        setEmergencyData(null);
-      });
-  });
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    fetchData();
+  }, []); // ...
   return (
     <IonPage id="view-message-page">
       <IonHeader translucent>
@@ -75,21 +67,20 @@ function ViewMessage() {
                   </span>
                 </h2>
                 <h3>
-                  To: <IonNote>Me</IonNote>
+                  To: <IonNote>{emergencyData.pasiente}</IonNote>
                 </h3>
               </IonLabel>
             </IonItem>
 
             <div className="ion-padding">
-              <h1>{emergencyData.title}</h1>
+              <p>{emergencyData.description}</p>
+
+              <img src={emergencyData.photoUrl} alt="Emergency" />
               <p>{emergencyData.date}</p>
-              {emergencyData.photoURL && (
-                <img src={emergencyData.photoURL} alt="Emergency" />
-              )}
             </div>
           </>
         ) : (
-          <div>Message not found</div>
+          <div>No se encontraron mensajes</div>
         )}
       </IonContent>
     </IonPage>

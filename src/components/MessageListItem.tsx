@@ -8,7 +8,7 @@ interface MessageListItemProps {
 
 const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
   return (
-    <IonItem routerLink={`/llamada/${message.id}`} detail={false}>
+    <IonItem routerLink={`/llamada/${message.date}`} detail={false}>
       <div slot="start" className="dot dot-unread"></div>
       <IonLabel className="ion-text-wrap">
         <h2>{message.paciente}</h2>

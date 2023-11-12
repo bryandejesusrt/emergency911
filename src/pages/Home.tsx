@@ -30,7 +30,7 @@ const Home: React.FC = () => {
     const fetchData = async () => {
       try {
         const msgs = await getMessages();
-        console.log(msgs); // Agrega este console.log
+        console.log(msgs);
         if (Array.isArray(msgs)) {
           setEmergencies(msgs as Emergency[]);
         } else {

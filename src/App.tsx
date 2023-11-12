@@ -33,7 +33,7 @@ const App: React.FC = () => (
       <IonRouterOutlet>
         <Route path="/" component={Home} exact />
         <Route path="/new-emergency" component={NewEmergency} exact />
-        <Route path="/llamada/:id">
+        <Route path="/llamada/:date">
           <ViewMessage />
         </Route>
       </IonRouterOutlet>
