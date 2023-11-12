@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Message, getMessage } from '../data/messages';
+import React, { useState, useEffect } from "react";
 import {
   IonBackButton,
   IonButtons,
@@ -12,40 +11,67 @@ import {
   IonPage,
   IonToolbar,
   useIonViewWillEnter,
-} from '@ionic/react';
-import { personCircle } from 'ionicons/icons';
-import { useParams } from 'react-router';
-import './ViewMessage.css';
+  useIonViewDidEnter,
+} from "@ionic/react";
+import { personCircle } from "ionicons/icons";
+import { useParams } from "react-router";
+import { getDatabase, ref, get, child } from "firebase/database";
+import firebaseApp from "../data/firebaseConfig";
+import "./ViewMessage.css";
+import { Emergency } from "../data/model";
 
 function ViewMessage() {
-  const [message, setMessage] = useState<Message>();
+  const [emergencyData, setEmergencyData] = useState<Emergency | null>(null);
   const params = useParams<{ id: string }>();
 
-  useIonViewWillEnter(() => {
-    const msg = getMessage(parseInt(params.id, 10));
-    setMessage(msg);
-  });
+  useIonViewDidEnter(() => {
+    console.log("ionViewWillEnter event fired");
+    const db = getDatabase(firebaseApp);
+    const messageRef = ref(db, `llamada/1/${params.id}`);
 
+    get(child(messageRef, "/"))
+      .then((snapshot) => {
+        console.log(snapshot.val());
+        console.log(params.id);
+        if (
+          snapshot.exists() &&
+          snapshot.val() !== null &&
+          snapshot.val() !== undefined
+        ) {
+          setEmergencyData(snapshot.val());
+        } else {
+          setEmergencyData(null);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching message:", error);
+        setEmergencyData(null);
+      });
+  });
   return (
     <IonPage id="view-message-page">
       <IonHeader translucent>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Inbox" defaultHref="/home"></IonBackButton>
+            <IonBackButton text="Inicio" defaultHref="/home"></IonBackButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        {message ? (
+        {emergencyData ? (
           <>
             <IonItem>
-              <IonIcon aria-hidden="true" icon={personCircle} color="primary"></IonIcon>
+              <IonIcon
+                aria-hidden="true"
+                icon={personCircle}
+                color="primary"
+              ></IonIcon>
               <IonLabel className="ion-text-wrap">
                 <h2>
-                  {message.fromName}
+                  {emergencyData.title}
                   <span className="date">
-                    <IonNote>{message.date}</IonNote>
+                    <IonNote>{emergencyData.date}</IonNote>
                   </span>
                 </h2>
                 <h3>
@@ -55,16 +81,11 @@ function ViewMessage() {
             </IonItem>
 
             <div className="ion-padding">
-              <h1>{message.subject}</h1>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p>
+              <h1>{emergencyData.title}</h1>
+              <p>{emergencyData.date}</p>
+              {emergencyData.photoURL && (
+                <img src={emergencyData.photoURL} alt="Emergency" />
+              )}
             </div>
           </>
         ) : (

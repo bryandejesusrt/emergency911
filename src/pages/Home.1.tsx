@@ -1,5 +1,6 @@
 import MessageListItem from "../components/MessageListItem";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useState } from "react";
 import { Emergency, getMessages } from "../data/model";
 import {
   IonButton,
@@ -10,29 +11,23 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonRouterLink,
   IonTitle,
   IonToolbar,
   useIonViewWillEnter,
 } from "@ionic/react";
-import "./Home.css";
-import { add, iceCream, newspaper, star } from "ionicons/icons";
+import { add } from "ionicons/icons";
 import { useHistory } from "react-router";
-import * as firebase from "firebase/app";
-import "firebase/database";
-import "firebase/storage";
 
-const Home: React.FC = () => {
+export const Home: React.FC = () => {
   const history = useHistory();
-  const [Emergency, setEmergencies] = useState<Emergency[]>([]);
+  const [Emergency, setMessage] = useState<Emergency[]>([]);
 
-  useEffect(() => {
+  useIonViewWillEnter(() => {
     const fetchData = async () => {
       try {
         const msgs = await getMessages();
-        console.log(msgs); // Agrega este console.log
         if (Array.isArray(msgs)) {
-          setEmergencies(msgs as Emergency[]);
+          setMessage(msgs);
         } else {
           console.error("Invalid data received:", msgs);
         }
@@ -42,34 +37,16 @@ const Home: React.FC = () => {
     };
 
     fetchData();
-  }, []); // ...
+  });
 
   const refresh = (e: CustomEvent) => {
     setTimeout(() => {
       e.detail.complete();
     }, 3000);
   };
-
   const navigateToNewEmergency = () => {
     history.push("/new-emergency");
   };
-
-  const fetchAndSetEmergencies = async () => {
-    try {
-      const msgs = await getMessages();
-      if (Array.isArray(msgs)) {
-        setEmergencies(msgs as Emergency[]);
-      } else {
-        console.error("Invalid data received:", msgs);
-      }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
-  };
-
-  useIonViewWillEnter(() => {
-    fetchAndSetEmergencies();
-  });
   return (
     <IonPage id="home-page">
       <IonHeader>
@@ -93,11 +70,10 @@ const Home: React.FC = () => {
 
         <IonList>
           {Emergency.map((emergency) => (
-            <MessageListItem key={emergency.date} message={emergency} />
+            <MessageListItem key={emergency.id} message={emergency} />
           ))}
         </IonList>
       </IonContent>
     </IonPage>
   );
 };
-export default Home;

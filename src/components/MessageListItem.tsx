@@ -1,30 +1,23 @@
-import {
-  IonItem,
-  IonLabel,
-  IonNote
-  } from '@ionic/react';
-import { Message } from '../data/messages';
-import './MessageListItem.css';
+import { IonItem, IonLabel, IonNote } from "@ionic/react";
+import { Emergency } from "../data/model";
+import "./MessageListItem.css";
 
 interface MessageListItemProps {
-  message: Message;
+  message: Emergency;
 }
 
 const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
   return (
-    <IonItem routerLink={`/message/${message.id}`} detail={false}>
+    <IonItem routerLink={`/llamada/${message.id}`} detail={false}>
       <div slot="start" className="dot dot-unread"></div>
       <IonLabel className="ion-text-wrap">
-        <h2>
-          {message.fromName}
-          <span className="date">
-            <IonNote>{message.date}</IonNote>
-          </span>
-        </h2>
-        <h3>{message.subject}</h3>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </p>
+        <h2>{message.paciente}</h2>
+        <h3>{message.title}</h3>
+        <p>{message.description}</p>
+        <span className="date">
+          <IonNote>{message.date}</IonNote>
+        </span>
+        <i>{message.id}</i>
       </IonLabel>
     </IonItem>
   );

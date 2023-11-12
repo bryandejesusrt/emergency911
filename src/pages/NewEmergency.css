@@ -1,0 +1,18 @@
+.custom-padding {
+  padding: 150px;
+}
+
+.items-padding {
+  padding: 5px 15px 5px 15px;
+}
+.custom-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-custom {
+  /* padding-left: 100%; */
+  position: relative;
+  left: 100%;
+}
